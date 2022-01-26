@@ -1,0 +1,27 @@
+{
+  "printWidth": 120,
+  "singleQuote": true,
+  "overrides": [
+    {
+      "files": ["*.html", "*.ts", "*.scss", "*.json"],
+      "options": {
+        "printWidth": 120,
+        "arrowParens": "avoid",
+        "semi": true,
+        "htmlWhitespaceSensitivity": "strict",
+        "trailingComma": "all",
+        "bracketSpacing": true,
+        "tabWidth": 2,
+        "useTabs": false,
+        "embeddedLanguageFormatting": "off",
+        "endOfLine": "lf"
+      }
+    },
+    {
+      "files": ["*.html"],
+      "options": {
+        "printWidth": 140
+      }
+    }
+  ]
+}

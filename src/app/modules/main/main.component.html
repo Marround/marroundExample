@@ -1,0 +1,23 @@
+<nz-layout class="layout">
+  <nz-sider>
+    <div class="logo">
+      <a routerLink="/">Marround</a>
+    </div>
+    <ul nz-menu nzTheme="dark" nzMode="inline">
+      <li nz-menu-item nzMatchRouter>
+        <a routerLink="/data-state-management">Data state management</a>
+      </li>
+      <li nz-menu-item nzMatchRouter>
+        <a routerLink="/rxjs-pipeline">RXJS pipeline</a>
+      </li>
+    </ul>
+  </nz-sider>
+  <nz-layout class="right-layout">
+    <nz-content>
+      <div class="inner-content">
+        <router-outlet></router-outlet>
+      </div>
+    </nz-content>
+    <nz-footer>Powered by Marround, Implement By Angular</nz-footer>
+  </nz-layout>
+</nz-layout>

@@ -1,0 +1,113 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2021,
+    "project": ["./tsconfig.base.json"],
+    "sourceType": "module"
+  },
+  "plugins": ["@nrwl/nx", "@typescript-eslint", "simple-import-sort", "rxjs", "prettier", "import"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@angular-eslint/template/process-inline-templates",
+    "plugin:@nrwl/nx/typescript",
+    "plugin:@nrwl/nx/angular",
+    "plugin:@nrwl/nx/javascript",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "rules": {
+    "quotes": ["error", "single", { "allowTemplateLiterals": true }],
+    "semi": ["error", "always", { "omitLastInOneLineBlock": true }],
+    "comma-dangle": ["error", "always-multiline"],
+    "no-extra-boolean-cast": "off",
+    "no-return-await": "error",
+    "require-await": "error",
+    "no-undefined": "warn",
+    "arrow-body-style": ["error", "as-needed"],
+    "arrow-parens": ["error", "as-needed"],
+    "arrow-spacing": "error",
+    "max-depth": ["warn", 2],
+    "max-lines": ["warn", 200],
+    "eqeqeq": ["error", "always"],
+    "no-multi-spaces": "error",
+    "yoda": ["error", "never", { "exceptRange": true }],
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "no-unused-vars": "off",
+    "@angular-eslint/directive-class-suffix": ["error", { "suffixes": ["Directive", "Component"] }],
+    "@angular-eslint/directive-selector": ["error", { "type": "attribute", "prefix": "auto", "style": "camelCase" }],
+    "@angular-eslint/component-selector": ["error", { "type": "element", "prefix": "auto", "style": "kebab-case" }],
+    "max-len": [
+      "error",
+      {
+        "code": 120,
+        "ignoreUrls": true,
+        "ignorePattern": "^import\\s.+\\sfrom\\s.+;$", // Игнорируем длинну импортов
+        "ignoreTrailingComments": true,
+        "ignoreComments": true,
+        "ignoreStrings": true
+      }
+    ],
+    "operator-linebreak": [
+      "error",
+      "after",
+      {
+        "overrides": {
+          "?": "before",
+          ":": "before"
+        }
+      }
+    ],
+    "max-lines-per-function": [
+      "warn",
+      {
+        "max": 70,
+        "skipBlankLines": true,
+        "skipComments": true,
+        "IIFEs": true
+      }
+    ],
+    "@typescript-eslint/ban-types": [
+      "error",
+      {
+        "types": {
+          "Object": {
+            "message": "Use {} instead."
+          },
+          "String": {
+            "message": "Use string instead."
+          },
+          "Number": {
+            "message": "Use number instead."
+          },
+          "Boolean": {
+            "message": "Use boolean instead."
+          },
+          "Function": {
+            "message": "Use specific callable interface instead."
+          }
+        }
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "plugins": ["rxjs"],
+      "extends": ["plugin:rxjs/recommended"],
+      "rules": {
+        "rxjs/no-ignored-notifier": "error",
+        "rxjs/no-nested-subscribe": "error",
+        "rxjs/no-subject-unsubscribe": "error",
+        "rxjs/no-implicit-any-catch": "error"
+      }
+    }
+  ]
+}

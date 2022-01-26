@@ -1,0 +1,28 @@
+<div nz-row [nzGutter]="[0, 32]" nzAlign="middle" nzJustify="start">
+  <div nz-col nzSpan="24">
+    <button (click)="doFetch()">do Fetch</button>
+  </div>
+  <div nz-col nzSpan="24" [style.min-height]="'400px'">
+    <ng-container *ngIf="data$ | async as data; else loadingTmp">
+      <ng-container *ngTemplateOutlet="getTemplate(data); context: {data: data}">
+      </ng-container>
+    </ng-container>
+  </div>
+</div>
+
+<ng-template #loadingTmp>
+  <div>...Loading</div>
+</ng-template>
+
+<ng-template #viewTmp let-data="data">
+  <pre [style.max-height]="'350px'" [highlight]="data | json" [languages]="['typescript', 'html']" >
+  </pre>
+</ng-template>
+
+<ng-template #emptyTmp>
+  <div>EMPTY</div>
+</ng-template>
+
+<ng-template #errorTmp let-error="data">
+  <div>ERROR: {{error.message}}</div>
+</ng-template>
