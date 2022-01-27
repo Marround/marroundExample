@@ -98,7 +98,7 @@ function makeDataOrEmpty(data: any): any {
 }
 `;
 
-export const CODE = {
+export const DSM_CODE = {
   template,
   component,
   service,

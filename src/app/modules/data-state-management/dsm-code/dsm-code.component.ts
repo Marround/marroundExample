@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component} from '@angular/core';
-import {CODE} from './data';
+import {DSM_CODE} from './dsm-data';
 
 @Component({
   selector: 'mar-dsm-code',
@@ -7,5 +7,5 @@ import {CODE} from './data';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DsmCodeComponent {
-  code = CODE;
+  dsmCode = DSM_CODE;
 }
