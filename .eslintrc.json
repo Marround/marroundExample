@@ -8,16 +8,13 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2021,
-    "project": ["./tsconfig.base.json"],
+    "project": ["./tsconfig.json"],
     "sourceType": "module"
   },
-  "plugins": ["@nrwl/nx", "@typescript-eslint", "simple-import-sort", "rxjs", "prettier", "import"],
+  "plugins": ["@typescript-eslint", "simple-import-sort", "rxjs", "prettier", "import"],
   "extends": [
     "eslint:recommended",
     "plugin:@angular-eslint/template/process-inline-templates",
-    "plugin:@nrwl/nx/typescript",
-    "plugin:@nrwl/nx/angular",
-    "plugin:@nrwl/nx/javascript",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "prettier"
@@ -41,9 +38,8 @@
     "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/no-unused-vars": "warn",
     "no-unused-vars": "off",
-    "@angular-eslint/directive-class-suffix": ["error", { "suffixes": ["Directive", "Component"] }],
-    "@angular-eslint/directive-selector": ["error", { "type": "attribute", "prefix": "auto", "style": "camelCase" }],
-    "@angular-eslint/component-selector": ["error", { "type": "element", "prefix": "auto", "style": "kebab-case" }],
+//    "@angular-eslint/directive-selector": ["error", { "type": "attribute", "prefix": "mar", "style": "camelCase" }],
+//    "@angular-eslint/component-selector": ["error", { "type": "element", "prefix": "mar", "style": "kebab-case" }],
     "max-len": [
       "error",
       {

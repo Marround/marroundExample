@@ -10,10 +10,10 @@ import {RouterModule} from '@angular/router';
 
 @NgModule({
   declarations: [
-    MainComponent
+    MainComponent,
   ],
   exports: [
-    MainComponent
+    MainComponent,
   ],
   imports: [
     CommonModule,
@@ -21,7 +21,7 @@ import {RouterModule} from '@angular/router';
     NzGridModule,
     NzLayoutModule,
     NzMenuModule,
-    RouterModule
-  ]
+    RouterModule,
+  ],
 })
 export class MainModule { }

@@ -15,7 +15,7 @@ registerLocaleData(ru);
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),
@@ -23,9 +23,9 @@ registerLocaleData(ru);
     BrowserAnimationsModule,
     FormsModule,
     HttpClientModule,
-    CoreModule
+    CoreModule,
   ],
   bootstrap: [AppComponent],
-  providers: [{ provide: NZ_I18N, useValue: ru_RU }]
+  providers: [{ provide: NZ_I18N, useValue: ru_RU }],
 })
 export class AppModule { }

@@ -21,7 +21,7 @@ const template = `
 <ng-template #errorTmp let-error="data">
   <div>ERROR: {{error.message}}</div>
 </ng-template>
-`
+`;
 const component = `
 import {Component, TemplateRef, ViewChild} from '@angular/core';
 import {FetchService} from './services/fetch.service';
@@ -101,5 +101,5 @@ function makeDataOrEmpty(data: any): any {
 export const CODE = {
   template,
   component,
-  service
-}
+  service,
+};

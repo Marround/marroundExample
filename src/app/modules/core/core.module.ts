@@ -23,7 +23,7 @@ import {HIGHLIGHT_OPTIONS, HighlightModule, HighlightOptions} from 'ngx-highligh
           xml: () => import('highlight.js/lib/languages/xml'),
         },
       },
-    }
-  ]
+    },
+  ],
 })
 export class CoreModule { }

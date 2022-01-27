@@ -11,10 +11,10 @@ import {DsmExampleModule} from '../dsm-example/dsm-example.module';
 
 @NgModule({
   declarations: [
-    DsmCodeComponent
+    DsmCodeComponent,
   ],
   exports: [
-    DsmCodeComponent
+    DsmCodeComponent,
   ],
   imports: [
     CommonModule,
@@ -22,7 +22,7 @@ import {DsmExampleModule} from '../dsm-example/dsm-example.module';
     NzHighlightModule,
     NzGridModule,
     NzTypographyModule,
-    DsmExampleModule
-  ]
+    DsmExampleModule,
+  ],
 })
 export class DsmCodeModule { }

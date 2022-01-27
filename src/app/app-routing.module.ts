@@ -12,7 +12,7 @@ const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        component: IntroComponent
+        component: IntroComponent,
       },
       {
         path: 'data-state-management',
@@ -21,20 +21,20 @@ const routes: Routes = [
       {
         path: 'rxjs-pipeline',
         loadChildren: () => import('./modules/rxjs-pipeline/rxjs-pipeline.module').then(m => m.RxjsPipelineModule),
-      }
-    ]
+      },
+    ],
   },
   {
     path: '*.*',
-    redirectTo: ''
-  }
+    redirectTo: '',
+  },
 ];
 
 @NgModule({
   imports: [
     RouterModule.forRoot(routes, {initialNavigation: 'enabledBlocking'}),
-    MainModule
+    MainModule,
   ],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class AppRoutingModule { }

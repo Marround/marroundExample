@@ -1,113 +1,146 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {fromEvent, map, Observable, pairwise, startWith, switchMap, takeUntil, withLatestFrom} from 'rxjs';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  Inject,
+  PLATFORM_ID,
+  ViewChild,
+} from '@angular/core';
+import {fromEvent, map, Observable, pairwise, startWith, switchMap, takeUntil, tap, withLatestFrom} from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
+import { OnDestroyDirective } from '../../shared/utils/rxjs-unsubscribers/on-destroy.directive';
 
 @Component({
   selector: 'mar-rxjs-pipeline',
   templateUrl: './rxjs-pipeline.component.html',
-  styleUrls: ['./rxjs-pipeline.component.scss']
+  styleUrls: ['./rxjs-pipeline.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RxjsPipelineComponent implements OnInit {
-  @ViewChild('canvas', {static: true}) private _canvas!: ElementRef<HTMLCanvasElement>
-  @ViewChild('range', {static: true}) private _range!: ElementRef<HTMLInputElement>
-  @ViewChild('color', {static: true}) private _color!: ElementRef<HTMLInputElement>
+export class RxjsPipelineComponent extends OnDestroyDirective implements AfterViewInit {
+  @ViewChild('canvas', { static: true }) private _canvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('range', { static: true }) private _range!: ElementRef<HTMLInputElement>;
+  @ViewChild('color', { static: true }) private _color!: ElementRef<HTMLInputElement>;
 
-  private canvas!: HTMLCanvasElement
-  private range!: HTMLInputElement
-  private color!: HTMLInputElement
-  ctx!:CanvasRenderingContext2D
-  scale = window.devicePixelRatio
+  private canvas!: HTMLCanvasElement;
+  private range!: HTMLInputElement;
+  private color!: HTMLInputElement;
 
-  lineWidth$!: Observable<number>
-  strokeStyle$!: Observable<any>
+  private ctx!: CanvasRenderingContext2D;
+  private scale = isPlatformBrowser(this.platformId) ? window.devicePixelRatio : 2;
 
-  isChanged = false;
+  private lineWidth$!: Observable<number>;
+  private strokeStyle$!: Observable<string>;
 
-  mouseMove$!: Observable<MouseEvent>
-  mouseDown$!: Observable<MouseEvent>
-  mouseUp$!: Observable<MouseEvent>
-  mouseOut$!: Observable<MouseEvent>
+  private mouseMove$!: Observable<MouseEvent>;
+  private mouseDown$!: Observable<MouseEvent>;
+  private mouseUp$!: Observable<MouseEvent>;
+  private mouseOut$!: Observable<MouseEvent>;
 
-  stream$!: Observable<any>
+  private stream$!: Observable<IDrawSettings[]>;
 
-
-  constructor() {
-
+  constructor(@Inject(PLATFORM_ID) private platformId: object) {
+    super();
   }
 
-  ngOnInit() {
+  ngAfterViewInit() {
+    this.initNativeElements();
+
+    this.initStreams();
+
+    this.createContext();
+
+    this.initStream();
+
+    this.stream$.pipe(
+      tap(this.drawLine.bind(this)),
+      takeUntil(this.destroy$),
+    ).subscribe();
+  }
+
+  private drawLine([from, to]: IDrawSettings[]): void {
+    const { lineWidth, strokeStyle } = from.options;
+    this.ctx.lineWidth = lineWidth;
+    this.ctx.strokeStyle = strokeStyle;
+    this.ctx.lineCap = 'round';
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(from.x, from.y);
+    this.ctx.lineTo(to.x, to.y);
+    this.ctx.stroke();
+  }
+
+  private initStream(): void {
+    this.stream$ = this.mouseDown$.pipe(
+      withLatestFrom(this.lineWidth$, this.strokeStyle$, (_, lineWidth, strokeStyle) => ({ lineWidth, strokeStyle })),
+      takeUntil(this.destroy$),
+      switchMap(options =>
+        this.mouseMove$.pipe(
+          map(e => ({ x: e.offsetX, y: e.offsetY, options })),
+          pairwise(),
+          takeUntil(this.mouseUp$),
+          takeUntil(this.mouseOut$),
+        ),
+      ),
+    );
+  }
+
+  private initNativeElements(): void {
     this.canvas = this._canvas.nativeElement;
     this.range = this._range.nativeElement;
     this.color = this._color.nativeElement;
-
-    this.lineWidth$ = this.createInputStream(this.range)
-    this.strokeStyle$ = this.createInputStream(this.color)
-
-    this.mouseMove$ = fromEvent<MouseEvent>(this.canvas, 'mousemove')
-    this.mouseDown$ = fromEvent<MouseEvent>(this.canvas, 'mousedown')
-    this.mouseUp$ = fromEvent<MouseEvent>(this.canvas, 'mouseup')
-    this.mouseOut$ = fromEvent<MouseEvent>(this.canvas, 'mouseout')
-
-    // @ts-ignore
-    this.ctx = this.canvas.getContext('2d')
-    const rect = this.canvas.getBoundingClientRect()
-
-    this.canvas.width = rect.width * this.scale
-    this.canvas.height = rect.height * this.scale
-    this.ctx.scale(this.scale, this.scale)
-
-    this.stream$ = this.mouseDown$
-      .pipe(
-        withLatestFrom(this.lineWidth$, this.strokeStyle$, (_, lineWidth, strokeStyle) => {
-          return {lineWidth, strokeStyle}
-        }),
-        switchMap(options => {
-          return this.mouseMove$
-            .pipe(
-              map(e => ({
-                x: e.offsetX,
-                y: e.offsetY,
-                options
-              })),
-              pairwise(),
-              takeUntil(this.mouseUp$),
-              takeUntil(this.mouseOut$)
-            )
-        })
-      )
-
-    this.stream$.subscribe(([from, to]) => {
-      const {lineWidth, strokeStyle} = from.options
-
-      this.ctx.lineWidth = lineWidth
-      this.ctx.strokeStyle = strokeStyle
-
-      this.ctx.beginPath()
-      this.ctx.moveTo(from.x, from.y)
-      this.ctx.lineTo(to.x, to.y)
-      this.ctx.stroke()
-    })
   }
 
-  createInputStream(node: HTMLInputElement) {
-    return fromEvent<InputEvent>(node, 'input')
-      .pipe(
-        // @ts-ignore
-        map(e => e?.target?.value),
-        startWith(node.value)
-      )
+  private initStreams(): void {
+    this.lineWidth$ = this.createInputStream(this.range).pipe(
+      map<TInputValue, number>(data => Number(data)),
+      takeUntil(this.destroy$),
+    );
+    this.strokeStyle$ = this.createInputStream(this.color).pipe(
+      map<TInputValue, string>(data => String(data)),
+      takeUntil(this.destroy$),
+    );
+
+    this.mouseMove$ = this.initMouseEventStream(this.canvas, 'mousemove');
+    this.mouseDown$ = this.initMouseEventStream(this.canvas, 'mousedown');
+    this.mouseUp$ = this.initMouseEventStream(this.canvas, 'mouseup');
+    this.mouseOut$ = this.initMouseEventStream(this.canvas, 'mouseout');
   }
 
+  private initMouseEventStream<T extends MouseEvent>(target: HTMLCanvasElement, eventName: string): Observable<T> {
+    return fromEvent<T>(target, eventName).pipe(takeUntil(this.destroy$));
+  }
+
+  private createInputStream(node: HTMLInputElement): Observable<string | null> {
+    return fromEvent<InputEvent>(node, 'input').pipe(
+      map(e => e?.data),
+      startWith(node.value),
+    );
+  }
+
+  private createContext(): void {
+    this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
+    const rect = this.canvas.getBoundingClientRect();
+
+    this.canvas.width = rect.width * this.scale;
+    this.canvas.height = rect.height * this.scale;
+    this.ctx.scale(this.scale, this.scale);
+  }
 
   clearCanvas() {
-    this.isChanged = false;
-    this.ctx.clearRect(0, 0, 0, 0)
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
   toBase64() {
-    if (this.isChanged) {
-      const image = this.ctx.canvas.toDataURL('image/png');
-      console.log(image);
-    }
+    const image = this.ctx.canvas.toDataURL('image/png');
+    console.log(image);
   }
+}
 
+type TInputValue = string | null;
+
+interface IDrawSettings {
+  x: number;
+  y: number;
+  options: { lineWidth: number; strokeStyle: string };
 }

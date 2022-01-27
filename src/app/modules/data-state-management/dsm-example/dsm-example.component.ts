@@ -1,16 +1,16 @@
-import {Component, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core';
-import {catchError, of, takeUntil} from 'rxjs';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {takeUntil} from 'rxjs';
 import {FetchService} from './services/fetch.service';
 import {OnDestroyDirective} from '../../../shared/utils/rxjs-unsubscribers/on-destroy.directive';
 
 @Component({
   selector: 'mar-dsm-example',
   templateUrl: './dsm-example.component.html',
-  styleUrls: ['./dsm-example.component.scss']
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DsmExampleComponent extends OnDestroyDirective implements OnInit, OnDestroy {
   data$ = this.fetch.photos$.pipe(
-    takeUntil(this.destroy$)
+    takeUntil(this.destroy$),
   );
 
   @ViewChild('viewTmp', {static: true}) view!: TemplateRef<any>;
@@ -36,9 +36,9 @@ export class DsmExampleComponent extends OnDestroyDirective implements OnInit, O
       return this.error;
     }
     if (data.length) {
-      return this.view
+      return this.view;
     } else {
-      return this.empty
+      return this.empty;
     }
   }
 

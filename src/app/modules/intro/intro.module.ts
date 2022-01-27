@@ -8,12 +8,12 @@ import {NzTypographyModule} from 'ng-zorro-antd/typography';
 
 @NgModule({
   declarations: [
-    IntroComponent
+    IntroComponent,
   ],
   imports: [
     CommonModule,
     NzGridModule,
-    NzTypographyModule
-  ]
+    NzTypographyModule,
+  ],
 })
 export class IntroModule { }

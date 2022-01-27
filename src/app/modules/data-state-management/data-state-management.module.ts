@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import {Injector, NgModule} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataStateManagementComponent } from './data-state-management.component';
 import {DataStateManagementRoutes} from './data-state-management.routes';
@@ -9,13 +9,19 @@ import {NzGridModule} from 'ng-zorro-antd/grid';
 
 @NgModule({
   declarations: [
-    DataStateManagementComponent
+    DataStateManagementComponent,
   ],
   imports: [
     CommonModule,
     DataStateManagementRoutes,
     DsmCodeModule,
-    NzGridModule
-  ]
+    NzGridModule,
+  ],
 })
-export class DataStateManagementModule { }
+export class DataStateManagementModule {
+  public static injector: Injector;
+
+  constructor(injector: Injector) {
+    DataStateManagementModule.injector = injector;
+  }
+}
