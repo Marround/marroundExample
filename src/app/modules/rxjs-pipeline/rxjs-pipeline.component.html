@@ -13,12 +13,12 @@
 
   <div nz-col nzSpan="24">
     <div nz-row nzAlign="middle" nzJustify="space-between" [nzGutter]="[0, 32]">
-      <div class="input-field">
-        <input type="range" min="1" max="10" value="8" #range />
+      <div nz-col>
+        <input *ngIf="ctx" type="range" min="1" max="10" [(ngModel)]="ctx.lineWidth" />
       </div>
 
-      <div class="input-field">
-        <input type="color" #color value="#ff0000" />
+      <div nz-col>
+        <input *ngIf="ctx" type="color" #color [(ngModel)]="ctx.strokeStyle" />
       </div>
 
       <div nz-col nzSpan="24">

@@ -1,13 +1,14 @@
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   Inject,
   PLATFORM_ID,
   ViewChild,
 } from '@angular/core';
-import {fromEvent, map, Observable, pairwise, startWith, switchMap, takeUntil, tap, withLatestFrom} from 'rxjs';
+import { fromEvent, map, Observable, pairwise, switchMap, takeUntil, tap } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { OnDestroyDirective } from '../../shared/utils/rxjs-unsubscribers/on-destroy.directive';
 
@@ -23,14 +24,9 @@ export class RxjsPipelineComponent extends OnDestroyDirective implements AfterVi
   @ViewChild('color', { static: true }) private _color!: ElementRef<HTMLInputElement>;
 
   private canvas!: HTMLCanvasElement;
-  private range!: HTMLInputElement;
-  private color!: HTMLInputElement;
 
-  private ctx!: CanvasRenderingContext2D;
+  ctx!: CanvasRenderingContext2D;
   private scale = isPlatformBrowser(this.platformId) ? window.devicePixelRatio : 2;
-
-  private lineWidth$!: Observable<number>;
-  private strokeStyle$!: Observable<string>;
 
   private mouseMove$!: Observable<MouseEvent>;
   private mouseDown$!: Observable<MouseEvent>;
@@ -39,7 +35,7 @@ export class RxjsPipelineComponent extends OnDestroyDirective implements AfterVi
 
   private stream$!: Observable<IDrawSettings[]>;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: object) {
+  constructor(@Inject(PLATFORM_ID) private platformId: object, private cdr: ChangeDetectorRef) {
     super();
   }
 
@@ -52,18 +48,10 @@ export class RxjsPipelineComponent extends OnDestroyDirective implements AfterVi
 
     this.initStream();
 
-    this.stream$.pipe(
-      tap(this.drawLine.bind(this)),
-      takeUntil(this.destroy$),
-    ).subscribe();
+    this.stream$.pipe(tap(this.drawLine.bind(this)), takeUntil(this.destroy$)).subscribe();
   }
 
   private drawLine([from, to]: IDrawSettings[]): void {
-    const { lineWidth, strokeStyle } = from.options;
-    this.ctx.lineWidth = lineWidth;
-    this.ctx.strokeStyle = strokeStyle;
-    this.ctx.lineCap = 'round';
-
     this.ctx.beginPath();
     this.ctx.moveTo(from.x, from.y);
     this.ctx.lineTo(to.x, to.y);
@@ -72,11 +60,10 @@ export class RxjsPipelineComponent extends OnDestroyDirective implements AfterVi
 
   private initStream(): void {
     this.stream$ = this.mouseDown$.pipe(
-      withLatestFrom(this.lineWidth$, this.strokeStyle$, (_, lineWidth, strokeStyle) => ({ lineWidth, strokeStyle })),
       takeUntil(this.destroy$),
-      switchMap(options =>
+      switchMap(() =>
         this.mouseMove$.pipe(
-          map(e => ({ x: e.offsetX, y: e.offsetY, options })),
+          map(e => ({ x: e.offsetX, y: e.offsetY })),
           pairwise(),
           takeUntil(this.mouseUp$),
           takeUntil(this.mouseOut$),
@@ -87,20 +74,9 @@ export class RxjsPipelineComponent extends OnDestroyDirective implements AfterVi
 
   private initNativeElements(): void {
     this.canvas = this._canvas.nativeElement;
-    this.range = this._range.nativeElement;
-    this.color = this._color.nativeElement;
   }
 
   private initStreams(): void {
-    this.lineWidth$ = this.createInputStream(this.range).pipe(
-      map<TInputValue, number>(data => Number(data)),
-      takeUntil(this.destroy$),
-    );
-    this.strokeStyle$ = this.createInputStream(this.color).pipe(
-      map<TInputValue, string>(data => String(data)),
-      takeUntil(this.destroy$),
-    );
-
     this.mouseMove$ = this.initMouseEventStream(this.canvas, 'mousemove');
     this.mouseDown$ = this.initMouseEventStream(this.canvas, 'mousedown');
     this.mouseUp$ = this.initMouseEventStream(this.canvas, 'mouseup');
@@ -111,13 +87,6 @@ export class RxjsPipelineComponent extends OnDestroyDirective implements AfterVi
     return fromEvent<T>(target, eventName).pipe(takeUntil(this.destroy$));
   }
 
-  private createInputStream(node: HTMLInputElement): Observable<string | null> {
-    return fromEvent<InputEvent>(node, 'input').pipe(
-      map(e => e?.data),
-      startWith(node.value),
-    );
-  }
-
   private createContext(): void {
     this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
     const rect = this.canvas.getBoundingClientRect();
@@ -125,6 +94,11 @@ export class RxjsPipelineComponent extends OnDestroyDirective implements AfterVi
     this.canvas.width = rect.width * this.scale;
     this.canvas.height = rect.height * this.scale;
     this.ctx.scale(this.scale, this.scale);
+
+    this.ctx.lineCap = 'round';
+    this.ctx.lineWidth = 8;
+    this.ctx.strokeStyle = '#ff0000';
+    this.cdr.markForCheck();
   }
 
   clearCanvas() {
@@ -137,10 +111,7 @@ export class RxjsPipelineComponent extends OnDestroyDirective implements AfterVi
   }
 }
 
-type TInputValue = string | null;
-
 interface IDrawSettings {
   x: number;
   y: number;
-  options: { lineWidth: number; strokeStyle: string };
 }
