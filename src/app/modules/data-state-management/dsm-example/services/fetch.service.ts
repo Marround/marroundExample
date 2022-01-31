@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {BehaviorSubject, catchError, delay, map, Observable, of, switchMap, tap, throwError} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
+import {backoff} from '../../../../shared/utils/rxjs-operators/backoff';
 
 export const FETCH_URL = 'https://jsonplaceholder.typicode.com';
 
@@ -19,6 +20,7 @@ export class FetchService {
 
   getPhotos(): void {
     of(null).pipe(
+      backoff(),
       delay(3000),
       switchMap(this.makeErrorOrData.bind(this)),
       catchError((err: Error) => of(new Error(err.message))),
