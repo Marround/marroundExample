@@ -1,0 +1,17 @@
+<div nz-row class="kit-card">
+  <ng-container *ngTemplateOutlet="title ? simpleTitle : extraTitle"></ng-container>
+
+  <div nz-col nzSpan="24" class="kit-card-content">
+    <ng-content></ng-content>
+  </div>
+</div>
+
+<ng-template #simpleTitle>
+  <div nz-col nzSpan="24" class="kit-card-title">{{title}}</div>
+</ng-template>
+
+<ng-template #extraTitle>
+  <div nz-col nzSpan="24">
+    <ng-content select="mar-kit-card-title"></ng-content>
+  </div>
+</ng-template>

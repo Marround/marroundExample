@@ -22,6 +22,10 @@ const routes: Routes = [
         path: 'rxjs-pipeline',
         loadChildren: () => import('./modules/rxjs-pipeline/rxjs-pipeline.module').then(m => m.RxjsPipelineModule),
       },
+      {
+        path: 'card',
+        loadChildren: () => import('./modules/card/card.module').then(m => m.CardModule),
+      },
     ],
   },
   {
